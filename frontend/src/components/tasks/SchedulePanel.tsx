@@ -124,7 +124,7 @@ export function SchedulePanel({ task }: SchedulePanelProps) {
       </CardHeader>
       <CardContent className="space-y-4">
         <p className="text-sm text-muted-foreground">
-          Run this task on a cron schedule. Requires backend scheduling support.
+          Run this task on a cron schedule. In v1, scheduled runs only fire while the app and backend are open.
         </p>
 
         {showError && (
@@ -137,8 +137,8 @@ export function SchedulePanel({ task }: SchedulePanelProps) {
 
         {schedule && (
           <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-            <span>Last run: {formatDateTime(schedule.last_run)}</span>
-            <span>Next run: {formatDateTime(schedule.next_run)}</span>
+            <span>Last run: {formatDateTime(schedule.last_run_at)}</span>
+            <span>Next run: {formatDateTime(schedule.next_run_at)}</span>
           </div>
         )}
 

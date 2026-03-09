@@ -276,3 +276,30 @@ type MCPToolCallRequest struct {
 	ToolName  string         `json:"tool_name"`
 	Arguments map[string]any `json:"arguments,omitempty"`
 }
+
+// --- Scheduling ---
+
+type Schedule struct {
+	ID        string     `json:"id"`
+	TaskID    string     `json:"task_id"`
+	CronExpr  string     `json:"cron_expr"`
+	Timezone  string     `json:"timezone,omitempty"`
+	Enabled   bool       `json:"enabled"`
+	LastRunAt *time.Time `json:"last_run_at,omitempty"`
+	NextRunAt *time.Time `json:"next_run_at,omitempty"`
+	CreatedAt time.Time  `json:"created_at"`
+	UpdatedAt time.Time  `json:"updated_at"`
+}
+
+type CreateScheduleRequest struct {
+	TaskID   string `json:"task_id,omitempty"`
+	CronExpr string `json:"cron_expr"`
+	Timezone string `json:"timezone,omitempty"`
+	Enabled  *bool  `json:"enabled,omitempty"`
+}
+
+type UpdateScheduleRequest struct {
+	CronExpr *string `json:"cron_expr,omitempty"`
+	Timezone *string `json:"timezone,omitempty"`
+	Enabled  *bool   `json:"enabled,omitempty"`
+}

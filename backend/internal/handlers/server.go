@@ -23,6 +23,7 @@ type Server struct {
 	Objectives    *services.ObjectiveService
 	MCPServers    *services.MCPServerService
 	MCPClients    *mcpclient.ClientManager
+	Schedules     *services.SchedulerService
 }
 
 // NewServer creates a Server with all services wired up.
@@ -37,6 +38,7 @@ func NewServer(
 	objSvc *services.ObjectiveService,
 	mcpSvc *services.MCPServerService,
 	mcpClientMgr *mcpclient.ClientManager,
+	scheduleSvc *services.SchedulerService,
 ) *Server {
 	return &Server{
 		Conversations: convSvc,
@@ -49,6 +51,7 @@ func NewServer(
 		Objectives:    objSvc,
 		MCPServers:    mcpSvc,
 		MCPClients:    mcpClientMgr,
+		Schedules:     scheduleSvc,
 	}
 }
 
@@ -83,6 +86,19 @@ func (s *Server) RegisterRoutes(r chi.Router) {
 				r.Delete("/", s.HandleDeleteTask)
 				r.Post("/run", s.HandleRunTask)
 				r.Post("/export", s.HandleExportTask)
+				r.Get("/schedule", s.HandleGetTaskSchedule)
+				r.Put("/schedule", s.HandleUpsertTaskSchedule)
+				r.Delete("/schedule", s.HandleDeleteTaskSchedule)
+			})
+		})
+
+		// Schedules
+		r.Route("/schedules", func(r chi.Router) {
+			r.Get("/", s.HandleListSchedules)
+			r.Post("/", s.HandleCreateSchedule)
+			r.Route("/{id}", func(r chi.Router) {
+				r.Put("/", s.HandleUpdateSchedule)
+				r.Delete("/", s.HandleDeleteSchedule)
 			})
 		})
 

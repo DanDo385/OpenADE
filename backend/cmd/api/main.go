@@ -53,9 +53,15 @@ func main() {
 	agentSvc := services.NewAgentService(database, provSvc, func(cfg *model.ProviderConfig) llm.Adapter {
 		return llm.NewOpenAI(cfg.APIKey, cfg.BaseURL, cfg.DefaultModel)
 	})
+	schedulerSvc := services.NewSchedulerService(database, taskSvc, runSvc, provSvc, func(cfg *model.ProviderConfig) llm.Adapter {
+		return llm.NewOpenAI(cfg.APIKey, cfg.BaseURL, cfg.DefaultModel)
+	})
+	schedulerCtx, schedulerCancel := context.WithCancel(context.Background())
+	defer schedulerCancel()
+	schedulerSvc.Start(schedulerCtx)
 
 	// --- HTTP Server ---
-	srv := handlers.NewServer(convSvc, taskSvc, runSvc, memSvc, provSvc, cmdSvc, agentSvc, objSvc, mcpSvc, mcpClientMgr)
+	srv := handlers.NewServer(convSvc, taskSvc, runSvc, memSvc, provSvc, cmdSvc, agentSvc, objSvc, mcpSvc, mcpClientMgr, schedulerSvc)
 
 	r := chi.NewRouter()
 
@@ -104,6 +110,8 @@ func main() {
 	if err := httpServer.Shutdown(ctx); err != nil {
 		log.Printf("Shutdown error: %v", err)
 	}
+	schedulerCancel()
+	schedulerSvc.Stop()
 	if err := mcpClientMgr.Close(); err != nil {
 		log.Printf("MCP client shutdown error: %v", err)
 	}

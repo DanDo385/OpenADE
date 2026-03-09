@@ -277,6 +277,25 @@ export const api = {
   importTask: (body: ExportBundle) =>
     request<Task>('/api/tasks/import', { method: 'POST', body: JSON.stringify(body) }),
 
+  listSchedules: (taskId?: string) => {
+    const suffix = taskId ? `?task_id=${encodeURIComponent(taskId)}` : ''
+    return request<Schedule[]>(`/api/schedules${suffix}`, { method: 'GET' })
+  },
+  createSchedule: (body: CreateScheduleRequest) =>
+    request<Schedule>('/api/schedules', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+  updateSchedule: (id: string, body: UpdateScheduleRequest) =>
+    request<Schedule>(`/api/schedules/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    }),
+  deleteScheduleById: (id: string) =>
+    request<{ ok: boolean }>(`/api/schedules/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }),
+
   getSchedule: (taskId: string) =>
     request<Schedule>(`/api/tasks/${encodeURIComponent(taskId)}/schedule`, { method: 'GET' }),
   upsertSchedule: (taskId: string, body: CreateScheduleRequest | UpdateScheduleRequest) =>

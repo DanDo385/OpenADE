@@ -53,6 +53,10 @@ pnpm run health
 - `3` Scheduling: automations, recurring runs, and skill suggestion flows
 - `4` Polish/export: Shadcn migration, export formats, MCP apps, and runtime handoff
 
+## Current Limits
+
+- Scheduled jobs in v1 run only while the app and backend are open.
+
 ## Direction
 
 OpenADE should feel like a place to chat with models, give them tools, inspect what they do, shape that behavior into reusable skills, and package the best results into portable capabilities.

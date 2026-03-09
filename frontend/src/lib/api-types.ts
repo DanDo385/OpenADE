@@ -60,8 +60,8 @@ export interface Schedule {
   cron_expr: string
   timezone?: string
   enabled: boolean
-  last_run?: string | null
-  next_run?: string | null
+  last_run_at?: string | null
+  next_run_at?: string | null
   created_at: string
   updated_at: string
 }
@@ -276,4 +276,3 @@ export interface UpdateMCPServerRequest {
   env_json?: string
   enabled?: boolean
 }
-

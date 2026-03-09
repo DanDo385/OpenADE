@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-const schemaVersion = 4
+const schemaVersion = 5
 
 const createTablesSQL = `
 CREATE TABLE IF NOT EXISTS schema_version (
@@ -106,6 +106,19 @@ CREATE TABLE IF NOT EXISTS mcp_servers (
 	created_at TEXT NOT NULL,
 	updated_at TEXT NOT NULL
 );
+
+CREATE TABLE IF NOT EXISTS scheduled_jobs (
+	id TEXT PRIMARY KEY,
+	task_id TEXT NOT NULL UNIQUE,
+	cron_expr TEXT NOT NULL,
+	timezone TEXT NOT NULL DEFAULT '',
+	enabled INTEGER NOT NULL DEFAULT 1,
+	last_run_at TEXT,
+	next_run_at TEXT,
+	created_at TEXT NOT NULL,
+	updated_at TEXT NOT NULL,
+	FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+);
 `
 
 // Migrate ensures the database schema is up to date.
@@ -155,6 +168,14 @@ func Migrate(db *sql.DB) error {
 			return fmt.Errorf("migrating to v4: %w", err)
 		}
 		if _, err := db.Exec(`UPDATE schema_version SET version = 4`); err != nil {
+			return fmt.Errorf("updating schema version: %w", err)
+		}
+	}
+	if currentVersion < 5 {
+		if err := migrateToV5(db); err != nil {
+			return fmt.Errorf("migrating to v5: %w", err)
+		}
+		if _, err := db.Exec(`UPDATE schema_version SET version = 5`); err != nil {
 			return fmt.Errorf("updating schema version: %w", err)
 		}
 	}
@@ -223,5 +244,25 @@ CREATE TABLE IF NOT EXISTS mcp_servers (
 
 func migrateToV4(db *sql.DB) error {
 	_, err := db.Exec(migrateV4SQL)
+	return err
+}
+
+const migrateV5SQL = `
+CREATE TABLE IF NOT EXISTS scheduled_jobs (
+	id TEXT PRIMARY KEY,
+	task_id TEXT NOT NULL UNIQUE,
+	cron_expr TEXT NOT NULL,
+	timezone TEXT NOT NULL DEFAULT '',
+	enabled INTEGER NOT NULL DEFAULT 1,
+	last_run_at TEXT,
+	next_run_at TEXT,
+	created_at TEXT NOT NULL,
+	updated_at TEXT NOT NULL,
+	FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+);
+`
+
+func migrateToV5(db *sql.DB) error {
+	_, err := db.Exec(migrateV5SQL)
 	return err
 }
