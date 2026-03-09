@@ -18,6 +18,7 @@ import (
 	"openade/internal/llm"
 	mcpclient "openade/internal/mcp"
 	"openade/internal/model"
+	"openade/internal/secrets"
 	"openade/internal/services"
 )
 
@@ -45,7 +46,10 @@ func main() {
 	runSvc := services.NewRunService(database)
 	memSvc := services.NewMemoryService(database)
 	provSvc := services.NewProviderService(database)
-	cmdSvc := services.NewCommandService()
+	secretProvider := secrets.NewEnvSecretProvider()
+	cmdSvc := services.NewCommandService(provSvc, convSvc, runSvc, secretProvider, func(cfg *model.ProviderConfig) llm.Adapter {
+		return llm.NewOpenAI(cfg.APIKey, cfg.BaseURL, cfg.DefaultModel)
+	})
 	objSvc := services.NewObjectiveService(database)
 	mcpSvc := services.NewMCPServerService(database)
 	mcpClientMgr := mcpclient.NewClientManager(mcpSvc)

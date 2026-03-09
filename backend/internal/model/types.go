@@ -219,10 +219,16 @@ type AgentRunResponse struct {
 	DurationMs int64  `json:"duration_ms"`
 }
 
+type SecretReference struct {
+	Name     string `json:"name"`
+	Required bool   `json:"required,omitempty"`
+}
+
 type AgentScriptBundle struct {
-	Type         string `json:"type"`
-	SystemPrompt string `json:"system_prompt,omitempty"`
-	Model        string `json:"model,omitempty"`
+	Type         string            `json:"type"`
+	SystemPrompt string            `json:"system_prompt,omitempty"`
+	Model        string            `json:"model,omitempty"`
+	Secrets      []SecretReference `json:"secrets,omitempty"`
 }
 
 // --- MCP servers ---

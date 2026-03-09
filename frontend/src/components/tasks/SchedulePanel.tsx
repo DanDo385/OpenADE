@@ -78,7 +78,7 @@ export function SchedulePanel({ task }: SchedulePanelProps) {
     mutationFn: (enabled: boolean) =>
       api.upsertSchedule(task.id, {
         cron_expr: schedule?.cron_expr ?? cronExpr.trim(),
-        timezone: schedule?.timezone ?? timezone.trim() || undefined,
+        timezone: schedule?.timezone ?? (timezone.trim() || undefined),
         enabled,
       }),
     onSuccess: () => {
