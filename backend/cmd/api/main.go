@@ -15,6 +15,8 @@ import (
 
 	"openade/internal/db"
 	"openade/internal/handlers"
+	"openade/internal/llm"
+	"openade/internal/model"
 	"openade/internal/services"
 )
 
@@ -43,11 +45,14 @@ func main() {
 	memSvc := services.NewMemoryService(database)
 	provSvc := services.NewProviderService(database)
 	cmdSvc := services.NewCommandService()
-	agentSvc := services.NewAgentService(database)
 	objSvc := services.NewObjectiveService(database)
+	mcpSvc := services.NewMCPServerService(database)
+	agentSvc := services.NewAgentService(database, provSvc, func(cfg *model.ProviderConfig) llm.Adapter {
+		return llm.NewOpenAI(cfg.APIKey, cfg.BaseURL, cfg.DefaultModel)
+	})
 
 	// --- HTTP Server ---
-	srv := handlers.NewServer(convSvc, taskSvc, runSvc, memSvc, provSvc, cmdSvc, agentSvc, objSvc)
+	srv := handlers.NewServer(convSvc, taskSvc, runSvc, memSvc, provSvc, cmdSvc, agentSvc, objSvc, mcpSvc)
 
 	r := chi.NewRouter()
 

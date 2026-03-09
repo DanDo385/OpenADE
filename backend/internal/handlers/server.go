@@ -20,6 +20,7 @@ type Server struct {
 	Commands      *services.CommandService
 	Agents        *services.AgentService
 	Objectives    *services.ObjectiveService
+	MCPServers    *services.MCPServerService
 }
 
 // NewServer creates a Server with all services wired up.
@@ -32,6 +33,7 @@ func NewServer(
 	cmdSvc *services.CommandService,
 	agentSvc *services.AgentService,
 	objSvc *services.ObjectiveService,
+	mcpSvc *services.MCPServerService,
 ) *Server {
 	return &Server{
 		Conversations: convSvc,
@@ -42,6 +44,7 @@ func NewServer(
 		Commands:      cmdSvc,
 		Agents:        agentSvc,
 		Objectives:    objSvc,
+		MCPServers:    mcpSvc,
 	}
 }
 
@@ -107,6 +110,17 @@ func (s *Server) RegisterRoutes(r chi.Router) {
 		r.Route("/agents/{id}", func(r chi.Router) {
 			r.Get("/", s.HandleGetAgent)
 			r.Post("/run", s.HandleRunAgent)
+		})
+
+		// MCP servers (Phase 2 foundation)
+		r.Route("/mcp/servers", func(r chi.Router) {
+			r.Get("/", s.HandleListMCPServers)
+			r.Post("/", s.HandleCreateMCPServer)
+			r.Route("/{id}", func(r chi.Router) {
+				r.Put("/", s.HandleUpdateMCPServer)
+				r.Delete("/", s.HandleDeleteMCPServer)
+				r.Post("/test", s.HandleTestMCPServer)
+			})
 		})
 
 	})

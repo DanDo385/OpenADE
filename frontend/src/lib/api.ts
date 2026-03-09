@@ -6,10 +6,12 @@ import type {
   CommandExecuteRequest,
   CommandExecuteResponse,
   Conversation,
+  CreateMCPServerRequest,
   CreateMessageRequest,
   CreateTaskRequest,
   ErrorResponse,
   ExportBundle,
+  MCPServer,
   Objective,
   ProviderSaveRequest,
   ProviderSaveResponse,
@@ -19,6 +21,7 @@ import type {
   SetMemoryRequest,
   Task,
   TaskDraft,
+  UpdateMCPServerRequest,
   UpdateTaskRequest,
   UpsertObjectiveRequest,
 } from './api-types'
@@ -308,4 +311,26 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(body ?? {}),
     }),
+
+  // MCP Servers
+  listMCPServers: () => request<MCPServer[]>('/api/mcp/servers', { method: 'GET' }),
+  createMCPServer: (body: CreateMCPServerRequest) =>
+    request<MCPServer>('/api/mcp/servers', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+  updateMCPServer: (id: string, body: UpdateMCPServerRequest) =>
+    request<MCPServer>(`/api/mcp/servers/${encodeURIComponent(id)}`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    }),
+  deleteMCPServer: (id: string) =>
+    request<{ ok: boolean }>(`/api/mcp/servers/${encodeURIComponent(id)}`, {
+      method: 'DELETE',
+    }),
+  testMCPServer: (id: string) =>
+    request<{ ok: boolean; message?: string }>(
+      `/api/mcp/servers/${encodeURIComponent(id)}/test`,
+      { method: 'POST' }
+    ),
 }

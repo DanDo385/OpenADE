@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"openade/internal/model"
 )
 
 // SeedAgents inserts default game agents if the agents table is empty.
@@ -18,9 +19,9 @@ func SeedAgents(ctx context.Context, database *sql.DB) error {
 
 	now := FormatTime(time.Now())
 	agents := []struct {
-		name        string
-		slug        string
-		desc        string
+		name         string
+		slug         string
+		desc         string
 		instructions string
 	}{
 		{"Blackjack", "blackjack", "A card game agent", "Play blackjack. Follow standard rules."},
@@ -29,7 +30,7 @@ func SeedAgents(ctx context.Context, database *sql.DB) error {
 
 	for _, a := range agents {
 		id := uuid.NewString()
-		bundle, _ := json.Marshal(map[string]any{})
+		bundle, _ := json.Marshal(model.AgentScriptBundle{Type: "prompt"})
 		_, err := database.ExecContext(ctx,
 			`INSERT INTO agents (id, name, slug, description, instructions, script_bundle_json, enabled, created_at, updated_at)
 			 VALUES (?, ?, ?, ?, ?, ?, 1, ?, ?)`,

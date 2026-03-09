@@ -4,20 +4,29 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
 	"openade/internal/db"
+	"openade/internal/llm"
 	"openade/internal/model"
 )
 
 type AgentService struct {
-	DB *sql.DB
+	DB         *sql.DB
+	Providers  *ProviderService
+	NewAdapter func(cfg *model.ProviderConfig) llm.Adapter
 }
 
-func NewAgentService(database *sql.DB) *AgentService {
-	return &AgentService{DB: database}
+func NewAgentService(database *sql.DB, providers *ProviderService, newAdapter func(cfg *model.ProviderConfig) llm.Adapter) *AgentService {
+	return &AgentService{
+		DB:         database,
+		Providers:  providers,
+		NewAdapter: newAdapter,
+	}
 }
 
 func (s *AgentService) List(ctx context.Context) ([]model.Agent, error) {
@@ -84,30 +93,59 @@ func (s *AgentService) Run(ctx context.Context, id string, req model.AgentRunReq
 		return nil, fmt.Errorf("agent is disabled")
 	}
 
-	start := time.Now()
-	// For MVP: agents run as echo of instructions + input (no real script execution)
-	// In Load 6 full implementation, script_bundle would define actual commands
-	output := "Agent: " + agent.Name + "\n"
-	if agent.Instructions != "" {
-		output += "Instructions: " + agent.Instructions + "\n"
-	}
-	if len(req.InputPayload) > 0 {
-		output += "Input: " + fmt.Sprintf("%v", req.InputPayload)
-	}
-	if output == "Agent: "+agent.Name+"\n" {
-		output += "Run complete. (No script bundle configured yet.)"
+	if s.Providers == nil || s.NewAdapter == nil {
+		return nil, errors.New("agent service is missing LLM dependencies")
 	}
 
+	provCfg, err := s.Providers.GetDefault(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("loading provider config: %w", err)
+	}
+	if provCfg == nil {
+		return nil, errors.New("no LLM provider configured")
+	}
+
+	bundle := agent.ScriptBundle
+	if bundle.Type == "" {
+		bundle.Type = "prompt"
+	}
+	if bundle.Type != "prompt" {
+		return nil, fmt.Errorf("unsupported agent script bundle type: %s", bundle.Type)
+	}
+
+	userMessage := strings.TrimSpace(stringFromMap(req.InputPayload, "message"))
+	if userMessage == "" {
+		return nil, errors.New("input_payload.message is required")
+	}
+
+	systemPrompt := strings.TrimSpace(joinNonEmpty("\n\n", bundle.SystemPrompt, agent.Instructions))
+	messages := make([]llm.ChatMessage, 0, 2)
+	if systemPrompt != "" {
+		messages = append(messages, llm.ChatMessage{Role: "system", Content: systemPrompt})
+	}
+	messages = append(messages, llm.ChatMessage{Role: "user", Content: userMessage})
+
+	modelName := bundle.Model
+	if modelName == "" {
+		modelName = provCfg.DefaultModel
+	}
+
+	start := time.Now()
+	result, err := s.NewAdapter(provCfg).Complete(ctx, messages, modelName)
 	dur := time.Since(start).Milliseconds()
+	if err != nil {
+		return nil, fmt.Errorf("running agent with llm: %w", err)
+	}
+
 	return &model.AgentRunResponse{
 		OK:         true,
-		Output:     output,
+		Output:     result.Content,
 		ExitCode:   0,
 		DurationMs: dur,
 	}, nil
 }
 
-func (s *AgentService) Create(ctx context.Context, name, slug, description, instructions string, scriptBundle map[string]any) (*model.Agent, error) {
+func (s *AgentService) Create(ctx context.Context, name, slug, description, instructions string, scriptBundle model.AgentScriptBundle) (*model.Agent, error) {
 	if slug == "" {
 		slug = stringsToSlug(name)
 	}
@@ -141,4 +179,31 @@ func stringsToSlug(s string) string {
 		}
 	}
 	return string(b)
+}
+
+func stringFromMap(values map[string]any, key string) string {
+	if values == nil {
+		return ""
+	}
+	switch v := values[key].(type) {
+	case string:
+		return v
+	case fmt.Stringer:
+		return v.String()
+	case nil:
+		return ""
+	default:
+		return fmt.Sprint(v)
+	}
+}
+
+func joinNonEmpty(sep string, parts ...string) string {
+	filtered := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" {
+			filtered = append(filtered, part)
+		}
+	}
+	return strings.Join(filtered, sep)
 }

@@ -194,15 +194,15 @@ type CommandExecuteResponse struct {
 // --- Agents (Load 6, 8) ---
 
 type Agent struct {
-	ID           string         `json:"id"`
-	Name         string         `json:"name"`
-	Slug         string         `json:"slug"`
-	Description  string         `json:"description"`
-	Instructions string         `json:"instructions"`
-	ScriptBundle map[string]any `json:"script_bundle,omitempty"`
-	Enabled      bool           `json:"enabled"`
-	CreatedAt    time.Time      `json:"created_at"`
-	UpdatedAt    time.Time      `json:"updated_at"`
+	ID           string            `json:"id"`
+	Name         string            `json:"name"`
+	Slug         string            `json:"slug"`
+	Description  string            `json:"description"`
+	Instructions string            `json:"instructions"`
+	ScriptBundle AgentScriptBundle `json:"script_bundle,omitempty"`
+	Enabled      bool              `json:"enabled"`
+	CreatedAt    time.Time         `json:"created_at"`
+	UpdatedAt    time.Time         `json:"updated_at"`
 }
 
 type AgentRunRequest struct {
@@ -216,3 +216,45 @@ type AgentRunResponse struct {
 	DurationMs int64  `json:"duration_ms"`
 }
 
+type AgentScriptBundle struct {
+	Type         string `json:"type"`
+	SystemPrompt string `json:"system_prompt,omitempty"`
+	Model        string `json:"model,omitempty"`
+}
+
+// --- MCP servers ---
+
+type MCPServer struct {
+	ID           string            `json:"id"`
+	Name         string            `json:"name"`
+	Transport    string            `json:"transport"`
+	CommandOrURL string            `json:"command_or_url"`
+	Args         []string          `json:"args"`
+	Env          map[string]string `json:"env"`
+	Enabled      bool              `json:"enabled"`
+	CreatedAt    time.Time         `json:"created_at"`
+	UpdatedAt    time.Time         `json:"updated_at"`
+}
+
+type CreateMCPServerRequest struct {
+	Name         string            `json:"name"`
+	Transport    string            `json:"transport"`
+	CommandOrURL string            `json:"command_or_url"`
+	Args         []string          `json:"args,omitempty"`
+	Env          map[string]string `json:"env,omitempty"`
+	Enabled      *bool             `json:"enabled,omitempty"`
+}
+
+type UpdateMCPServerRequest struct {
+	Name         *string           `json:"name,omitempty"`
+	Transport    *string           `json:"transport,omitempty"`
+	CommandOrURL *string           `json:"command_or_url,omitempty"`
+	Args         []string          `json:"args,omitempty"`
+	Env          map[string]string `json:"env,omitempty"`
+	Enabled      *bool             `json:"enabled,omitempty"`
+}
+
+type MCPServerTestResponse struct {
+	OK      bool   `json:"ok"`
+	Message string `json:"message"`
+}

@@ -9,6 +9,7 @@ import { useTasks } from './hooks/useTasks'
 import { useRuns } from './hooks/useRuns'
 import { ProviderModal } from './components/ProviderModal'
 import { ProviderSettings } from './components/settings/ProviderSettings'
+import { MCPServerSettings } from './components/settings/MCPServerSettings'
 import { ConversationList } from './components/chat/ConversationList'
 import { MessageList } from './components/chat/MessageList'
 import { MessageInput } from './components/chat/MessageInput'
@@ -385,8 +386,9 @@ function AppShell() {
           )}
 
           {activePanel === 'settings' && (
-            <section className="settings-panel">
+            <section className="settings-panel space-y-6">
               <ProviderSettings />
+              <MCPServerSettings />
             </section>
           )}
         </main>

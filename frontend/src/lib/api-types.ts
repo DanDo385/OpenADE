@@ -220,3 +220,36 @@ export interface AgentRunResponse {
   duration_ms: number
 }
 
+// --- MCP Servers ---
+export type MCPTransport = 'stdio' | 'sse'
+
+export interface MCPServer {
+  id: string
+  name: string
+  transport: MCPTransport
+  command_or_url: string
+  args_json: string
+  env_json: string
+  enabled: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateMCPServerRequest {
+  name: string
+  transport: MCPTransport
+  command_or_url: string
+  args_json?: string
+  env_json?: string
+  enabled?: boolean
+}
+
+export interface UpdateMCPServerRequest {
+  name?: string
+  transport?: MCPTransport
+  command_or_url?: string
+  args_json?: string
+  env_json?: string
+  enabled?: boolean
+}
+

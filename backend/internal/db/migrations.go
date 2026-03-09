@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-const schemaVersion = 3
+const schemaVersion = 4
 
 const createTablesSQL = `
 CREATE TABLE IF NOT EXISTS schema_version (
@@ -94,6 +94,18 @@ CREATE TABLE IF NOT EXISTS objectives (
 	updated_at TEXT NOT NULL,
 	FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS mcp_servers (
+	id TEXT PRIMARY KEY,
+	name TEXT NOT NULL,
+	transport TEXT NOT NULL,
+	command_or_url TEXT NOT NULL,
+	args_json TEXT NOT NULL DEFAULT '[]',
+	env_json TEXT NOT NULL DEFAULT '{}',
+	enabled INTEGER NOT NULL DEFAULT 1,
+	created_at TEXT NOT NULL,
+	updated_at TEXT NOT NULL
+);
 `
 
 // Migrate ensures the database schema is up to date.
@@ -135,6 +147,14 @@ func Migrate(db *sql.DB) error {
 			return fmt.Errorf("migrating to v3: %w", err)
 		}
 		if _, err := db.Exec(`UPDATE schema_version SET version = 3`); err != nil {
+			return fmt.Errorf("updating schema version: %w", err)
+		}
+	}
+	if currentVersion < 4 {
+		if err := migrateToV4(db); err != nil {
+			return fmt.Errorf("migrating to v4: %w", err)
+		}
+		if _, err := db.Exec(`UPDATE schema_version SET version = 4`); err != nil {
 			return fmt.Errorf("updating schema version: %w", err)
 		}
 	}
@@ -184,5 +204,24 @@ CREATE TABLE IF NOT EXISTS objectives (
 
 func migrateToV3(db *sql.DB) error {
 	_, err := db.Exec(migrateV3SQL)
+	return err
+}
+
+const migrateV4SQL = `
+CREATE TABLE IF NOT EXISTS mcp_servers (
+	id TEXT PRIMARY KEY,
+	name TEXT NOT NULL,
+	transport TEXT NOT NULL,
+	command_or_url TEXT NOT NULL,
+	args_json TEXT NOT NULL DEFAULT '[]',
+	env_json TEXT NOT NULL DEFAULT '{}',
+	enabled INTEGER NOT NULL DEFAULT 1,
+	created_at TEXT NOT NULL,
+	updated_at TEXT NOT NULL
+);
+`
+
+func migrateToV4(db *sql.DB) error {
+	_, err := db.Exec(migrateV4SQL)
 	return err
 }
