@@ -16,6 +16,7 @@ import (
 	"openade/internal/db"
 	"openade/internal/handlers"
 	"openade/internal/llm"
+	mcpclient "openade/internal/mcp"
 	"openade/internal/model"
 	"openade/internal/services"
 )
@@ -47,12 +48,14 @@ func main() {
 	cmdSvc := services.NewCommandService()
 	objSvc := services.NewObjectiveService(database)
 	mcpSvc := services.NewMCPServerService(database)
+	mcpClientMgr := mcpclient.NewClientManager(mcpSvc)
+	defer mcpClientMgr.Close()
 	agentSvc := services.NewAgentService(database, provSvc, func(cfg *model.ProviderConfig) llm.Adapter {
 		return llm.NewOpenAI(cfg.APIKey, cfg.BaseURL, cfg.DefaultModel)
 	})
 
 	// --- HTTP Server ---
-	srv := handlers.NewServer(convSvc, taskSvc, runSvc, memSvc, provSvc, cmdSvc, agentSvc, objSvc, mcpSvc)
+	srv := handlers.NewServer(convSvc, taskSvc, runSvc, memSvc, provSvc, cmdSvc, agentSvc, objSvc, mcpSvc, mcpClientMgr)
 
 	r := chi.NewRouter()
 
@@ -100,6 +103,9 @@ func main() {
 
 	if err := httpServer.Shutdown(ctx); err != nil {
 		log.Printf("Shutdown error: %v", err)
+	}
+	if err := mcpClientMgr.Close(); err != nil {
+		log.Printf("MCP client shutdown error: %v", err)
 	}
 
 	log.Println("Server stopped")

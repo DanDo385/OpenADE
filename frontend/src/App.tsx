@@ -17,6 +17,7 @@ import { TaskLibrary } from './components/tasks/TaskLibrary'
 import { TaskWizard } from './components/tasks/TaskWizard'
 import { TaskEditor } from './components/tasks/TaskEditor'
 import { RunPanel } from './components/tasks/RunPanel'
+import { SchedulePanel } from './components/tasks/SchedulePanel'
 import { MemoryPanel } from './components/memory/MemoryPanel'
 import { ExportImport } from './components/tasks/ExportImport'
 import { RunDetail } from './components/runs/RunDetail'
@@ -328,6 +329,7 @@ function AppShell() {
               ) : (
                 <>
                   <RunPanel task={selectedTask} />
+                  <SchedulePanel task={selectedTask} />
                   <TaskEditor task={selectedTask} />
                   <MemoryPanel taskId={selectedTask.id} taskName={selectedTask.name} />
                   <ExportImport tasks={tasks} onTaskImported={(t) => setActiveTaskId(t.id)} />

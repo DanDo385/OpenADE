@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"openade/internal/llm"
+	mcpclient "openade/internal/mcp"
 	"openade/internal/model"
 	"openade/internal/services"
 
@@ -21,6 +22,7 @@ type Server struct {
 	Agents        *services.AgentService
 	Objectives    *services.ObjectiveService
 	MCPServers    *services.MCPServerService
+	MCPClients    *mcpclient.ClientManager
 }
 
 // NewServer creates a Server with all services wired up.
@@ -34,6 +36,7 @@ func NewServer(
 	agentSvc *services.AgentService,
 	objSvc *services.ObjectiveService,
 	mcpSvc *services.MCPServerService,
+	mcpClientMgr *mcpclient.ClientManager,
 ) *Server {
 	return &Server{
 		Conversations: convSvc,
@@ -45,6 +48,7 @@ func NewServer(
 		Agents:        agentSvc,
 		Objectives:    objSvc,
 		MCPServers:    mcpSvc,
+		MCPClients:    mcpClientMgr,
 	}
 }
 
@@ -120,8 +124,10 @@ func (s *Server) RegisterRoutes(r chi.Router) {
 				r.Put("/", s.HandleUpdateMCPServer)
 				r.Delete("/", s.HandleDeleteMCPServer)
 				r.Post("/test", s.HandleTestMCPServer)
+				r.Get("/tools", s.HandleListMCPServerTools)
 			})
 		})
+		r.Post("/mcp/tools/call", s.HandleCallMCPTool)
 
 	})
 }

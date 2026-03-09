@@ -54,6 +54,30 @@ export interface TaskVersion {
   created_at: string
 }
 
+export interface Schedule {
+  id: string
+  task_id: string
+  cron_expr: string
+  timezone?: string
+  enabled: boolean
+  last_run?: string | null
+  next_run?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface CreateScheduleRequest {
+  cron_expr: string
+  timezone?: string
+  enabled?: boolean
+}
+
+export interface UpdateScheduleRequest {
+  cron_expr?: string
+  timezone?: string
+  enabled?: boolean
+}
+
 export interface Run {
   id: string
   task_id: string

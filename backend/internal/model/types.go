@@ -1,6 +1,9 @@
 package model
 
-import "time"
+import (
+	"encoding/json"
+	"time"
+)
 
 // --- Core entities ---
 
@@ -255,6 +258,21 @@ type UpdateMCPServerRequest struct {
 }
 
 type MCPServerTestResponse struct {
-	OK      bool   `json:"ok"`
-	Message string `json:"message"`
+	OK        bool          `json:"ok"`
+	Message   string        `json:"message"`
+	ToolCount int           `json:"tool_count,omitempty"`
+	Tools     []MCPToolInfo `json:"tools,omitempty"`
+}
+
+type MCPToolInfo struct {
+	Name         string          `json:"name"`
+	Description  string          `json:"description,omitempty"`
+	InputSchema  json.RawMessage `json:"input_schema,omitempty"`
+	OutputSchema json.RawMessage `json:"output_schema,omitempty"`
+}
+
+type MCPToolCallRequest struct {
+	ServerID  string         `json:"server_id"`
+	ToolName  string         `json:"tool_name"`
+	Arguments map[string]any `json:"arguments,omitempty"`
 }

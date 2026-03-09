@@ -8,6 +8,7 @@ import type {
   Conversation,
   CreateMCPServerRequest,
   CreateMessageRequest,
+  CreateScheduleRequest,
   CreateTaskRequest,
   ErrorResponse,
   ExportBundle,
@@ -18,10 +19,12 @@ import type {
   ProviderSummary,
   Run,
   RunTaskRequest,
+  Schedule,
   SetMemoryRequest,
   Task,
   TaskDraft,
   UpdateMCPServerRequest,
+  UpdateScheduleRequest,
   UpdateTaskRequest,
   UpsertObjectiveRequest,
 } from './api-types'
@@ -273,6 +276,18 @@ export const api = {
     request<ExportBundle>(`/api/tasks/${encodeURIComponent(id)}/export`, { method: 'POST' }),
   importTask: (body: ExportBundle) =>
     request<Task>('/api/tasks/import', { method: 'POST', body: JSON.stringify(body) }),
+
+  getSchedule: (taskId: string) =>
+    request<Schedule>(`/api/tasks/${encodeURIComponent(taskId)}/schedule`, { method: 'GET' }),
+  upsertSchedule: (taskId: string, body: CreateScheduleRequest | UpdateScheduleRequest) =>
+    request<Schedule>(`/api/tasks/${encodeURIComponent(taskId)}/schedule`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    }),
+  deleteSchedule: (taskId: string) =>
+    request<{ ok: boolean }>(`/api/tasks/${encodeURIComponent(taskId)}/schedule`, {
+      method: 'DELETE',
+    }),
 
   listRuns: () => request<Run[]>('/api/runs', { method: 'GET' }),
   getRun: (id: string) => request<Run>(`/api/runs/${encodeURIComponent(id)}`, { method: 'GET' }),
