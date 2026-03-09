@@ -160,3 +160,63 @@ export interface StreamErrorEvent {
 }
 
 export type ChatStreamEvent = StreamChunkEvent | StreamDoneEvent | StreamErrorEvent
+
+// --- Objectives ---
+export interface Objective {
+  id: string
+  conversation_id: string
+  title: string
+  goal: string
+  constraints: string
+  tools_required: string[]
+  success_criteria: string
+  created_at: string
+  updated_at: string
+}
+
+export interface UpsertObjectiveRequest {
+  title: string
+  goal: string
+  constraints?: string
+  tools_required?: string[]
+  success_criteria?: string
+}
+
+// --- Commands (Load 6) ---
+export interface CommandExecuteRequest {
+  input: string
+  confirm: boolean
+}
+
+export interface CommandExecuteResponse {
+  ok: boolean
+  output: string
+  stderr?: string
+  exit_code: number
+  duration_ms: number
+}
+
+// --- Agents (Load 6, 8) ---
+export interface Agent {
+  id: string
+  name: string
+  slug: string
+  description: string
+  instructions: string
+  script_bundle?: Record<string, unknown>
+  enabled: boolean
+  created_at: string
+  updated_at: string
+}
+
+export interface AgentRunRequest {
+  input_payload?: Record<string, unknown>
+}
+
+export interface AgentRunResponse {
+  ok: boolean
+  output: string
+  exit_code: number
+  duration_ms: number
+}
+

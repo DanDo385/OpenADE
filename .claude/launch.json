@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "backend",
+      "runtimeExecutable": "bash",
+      "runtimeArgs": ["-c", "cd backend && go run ./cmd/api"],
+      "port": 8080
+    },
+    {
+      "name": "frontend",
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["run", "dev:frontend"],
+      "port": 5173
+    }
+  ]
+}

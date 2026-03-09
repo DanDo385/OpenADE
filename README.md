@@ -1,52 +1,58 @@
 # OpenADE
 
-A local-first "chat-to-task" tool for repeatable LLM workflows. Chat with an LLM to explore a use case, then save the conversation as a reusable task with templated inputs.
+OpenADE is a capability studio and MCP host for experimenting with LLMs. It is a design-time environment for building, testing, packaging, and evolving AI capabilities through chat, tools, skills, workflows, and interactive UI.
 
-**Tech stack:** Go backend + TypeScript (React + Vite) frontend. Tauri is optional for later desktop packaging.
+## Vision
 
-- [ARCHITECTURE.md](ARCHITECTURE.md) – design, modules, key decisions
-- [IMPLEMENTATION_PLAN.md](IMPLEMENTATION_PLAN.md) – milestones, API routes, demo walkthrough
-- [IMPLEMENTATION_PARTS.md](IMPLEMENTATION_PARTS.md) – split work assignments
-- [PROJECT_STATUS_AND_REST_IMPLEMENTATION_PLAN.md](PROJECT_STATUS_AND_REST_IMPLEMENTATION_PLAN.md) – live status + detailed remaining plan
+OpenADE is not just a task app. The goal is to give models a flexible environment where they can explore ideas, call tools, generate interfaces, package working patterns into reusable capabilities, and eventually export those capabilities into other runtimes.
 
-## Local Development (Web-First)
+## Core Concepts
+
+- `Objective` — A lightweight design brief for a conversation or build session.
+- `Task` — A reusable unit of work with inputs, outputs, and execution history.
+- `Skill` — A packaged capability made of prompts, tools, templates, and behavior.
+- `Workflow` — A composition of tasks and skills into a larger process.
+- `Run` — One execution of a task, skill, or workflow.
+- `Automation` — A scheduled or triggered execution that runs over time.
+- `Tool` — A safe callable capability, built in or provided through MCP.
+- `Command` — A shell-like action that requires explicit approval.
+
+## Commands, Tools, Agents
+
+- `Commands` are shell-like and higher risk; they should require explicit user approval.
+- `Tools` are safe callables; they can be built in or exposed by MCP servers.
+- `Agents` orchestrate tools, tasks, and workflows toward a larger goal.
+
+## Architecture
+
+- Backend: Go API with Chi and SQLite, default local API port `8080`
+- Frontend: React + Vite with Zustand and TanStack Query, default dev port `5173`
+- Desktop wrapper: Tauri shell around the local frontend and backend
+
+## Run
 
 ```bash
-# 1) Install deps
 pnpm install
 cd frontend && pnpm install && cd ..
-
-# 2) Copy env defaults (optional)
 cp .env.example .env
 cp frontend/.env.example frontend/.env
-
-# 3) Start backend + frontend together
 pnpm run dev
 ```
-
-Useful commands:
 
 ```bash
 pnpm run dev:backend   # backend only
 pnpm run dev:frontend  # frontend only
-pnpm run health        # checks backend /health
+pnpm run health
 ```
 
-## Optional Tauri Packaging Later
+## Roadmap
 
-When web app behavior is stable, you can package with Tauri:
+- `1A` Foundation: README/product framing, ontology, objective model, agents and commands visible in the shell
+- `1B` Component protocol: safe model-driven UI generation for chat without arbitrary code execution
+- `2` MCP host: MCP server config, discovery, invocation, and secrets-provider abstraction
+- `3` Scheduling: automations, recurring runs, and skill suggestion flows
+- `4` Polish/export: Shadcn migration, export formats, MCP apps, and runtime handoff
 
-```bash
-pnpm run tauri:dev
-pnpm run tauri:build
-```
+## Direction
 
-## Commit and Push
-
-Run the script with an optional commit message:
-
-```bash
-./commit-and-push.sh "Your commit message"
-```
-
-If no message is given, it defaults to `Update`.
+OpenADE should feel like a place to chat with models, give them tools, inspect what they do, shape that behavior into reusable skills, and package the best results into portable capabilities.

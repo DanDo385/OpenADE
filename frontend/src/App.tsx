@@ -20,6 +20,9 @@ import { MemoryPanel } from './components/memory/MemoryPanel'
 import { ExportImport } from './components/tasks/ExportImport'
 import { RunDetail } from './components/runs/RunDetail'
 import { ErrorDisplay } from './components/ErrorDisplay'
+import { ObjectivePanel } from './components/chat/ObjectivePanel'
+import { AgentLibrary } from './components/agents/AgentLibrary'
+import { CommandOutputPanel } from './components/commands/CommandOutputPanel'
 
 interface ErrorBoundaryState {
   hasError: boolean
@@ -215,6 +218,20 @@ function AppShell() {
           </button>
           <button
             type="button"
+            className={`btn ${activePanel === 'agents' ? 'btn-primary' : ''}`}
+            onClick={() => setActivePanel('agents')}
+          >
+            Agents
+          </button>
+          <button
+            type="button"
+            className={`btn ${activePanel === 'commands' ? 'btn-primary' : ''}`}
+            onClick={() => setActivePanel('commands')}
+          >
+            Commands
+          </button>
+          <button
+            type="button"
             className={`btn ${activePanel === 'settings' ? 'btn-primary' : ''}`}
             onClick={() => setActivePanel('settings')}
           >
@@ -232,7 +249,13 @@ function AppShell() {
         </div>
       </header>
 
-      <div className="workspace">
+      <div
+        className={
+          ['runs', 'agents', 'commands', 'settings'].includes(activePanel)
+            ? 'workspace workspace--full'
+            : 'workspace'
+        }
+      >
         {activePanel === 'chat' && (
           <ConversationList
             conversations={conversations}
@@ -268,6 +291,7 @@ function AppShell() {
 
           {activePanel === 'chat' && (
             <>
+              <ObjectivePanel conversationId={activeConversationId} />
               {isMessagesLoading ? <p className="muted">Loading conversation...</p> : null}
               <MessageList
                 messages={messages}
@@ -345,6 +369,18 @@ function AppShell() {
                   <RunDetail runId={activeRunId} />
                 </>
               )}
+            </section>
+          )}
+
+          {activePanel === 'agents' && (
+            <section className="agents-panel">
+              <AgentLibrary />
+            </section>
+          )}
+
+          {activePanel === 'commands' && (
+            <section className="commands-panel">
+              <CommandOutputPanel />
             </section>
           )}
 

@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 
-export type AppPanel = 'chat' | 'tasks' | 'runs' | 'settings'
+export type AppPanel = 'chat' | 'tasks' | 'runs' | 'agents' | 'commands' | 'settings'
 export type AppTheme = 'light' | 'dark'
 
 interface UIState {

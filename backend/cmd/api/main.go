@@ -32,15 +32,22 @@ func main() {
 	defer database.Close()
 	log.Println("Database ready")
 
+	if err := db.SeedAgents(context.Background(), database); err != nil {
+		log.Printf("Seed agents warning: %v", err)
+	}
+
 	// --- Services ---
 	convSvc := services.NewConversationService(database)
 	taskSvc := services.NewTaskService(database)
 	runSvc := services.NewRunService(database)
 	memSvc := services.NewMemoryService(database)
 	provSvc := services.NewProviderService(database)
+	cmdSvc := services.NewCommandService()
+	agentSvc := services.NewAgentService(database)
+	objSvc := services.NewObjectiveService(database)
 
 	// --- HTTP Server ---
-	srv := handlers.NewServer(convSvc, taskSvc, runSvc, memSvc, provSvc)
+	srv := handlers.NewServer(convSvc, taskSvc, runSvc, memSvc, provSvc, cmdSvc, agentSvc, objSvc)
 
 	r := chi.NewRouter()
 

@@ -1,10 +1,16 @@
 import type {
+  Agent,
+  AgentRunRequest,
+  AgentRunResponse,
   ChatStreamEvent,
+  CommandExecuteRequest,
+  CommandExecuteResponse,
   Conversation,
   CreateMessageRequest,
   CreateTaskRequest,
   ErrorResponse,
   ExportBundle,
+  Objective,
   ProviderSaveRequest,
   ProviderSaveResponse,
   ProviderSummary,
@@ -14,6 +20,7 @@ import type {
   Task,
   TaskDraft,
   UpdateTaskRequest,
+  UpsertObjectiveRequest,
 } from './api-types'
 
 const DEFAULT_API_BASE_URL = 'http://localhost:8080'
@@ -174,6 +181,29 @@ export const api = {
     request<TaskDraft>(`/api/conversations/${encodeURIComponent(conversationId)}/draft-task`, {
       method: 'POST',
     }),
+  getObjective: (conversationId: string) =>
+    request<Objective>(`/api/conversations/${encodeURIComponent(conversationId)}/objective`, {
+      method: 'GET',
+    }),
+  upsertObjective: (conversationId: string, body: UpsertObjectiveRequest) =>
+    request<Objective>(`/api/conversations/${encodeURIComponent(conversationId)}/objective`, {
+      method: 'PUT',
+      body: JSON.stringify(body),
+    }),
+  exportObjectiveMarkdown: async (conversationId: string): Promise<string> => {
+    const response = await fetch(
+      `${API_BASE_URL}/api/conversations/${encodeURIComponent(conversationId)}/objective/export`,
+      { method: 'GET' }
+    )
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({}))
+      if (payload?.error?.message) {
+        throw new APIError(response.status, payload.error.code ?? 'export_failed', payload.error.message)
+      }
+      throw new APIError(response.status, 'export_failed', `export failed with status ${response.status}`)
+    }
+    return response.text()
+  },
 
   streamConversationMessage: async (
     conversationId: string,
@@ -261,4 +291,21 @@ export const api = {
         body: JSON.stringify({ value }),
       },
     ),
+
+  // Commands (Load 6)
+  executeCommand: (body: CommandExecuteRequest) =>
+    request<CommandExecuteResponse>('/api/commands/execute', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+
+  // Agents (Load 6, 8)
+  listAgents: () => request<Agent[]>('/api/agents', { method: 'GET' }),
+  getAgent: (id: string) =>
+    request<Agent>(`/api/agents/${encodeURIComponent(id)}`, { method: 'GET' }),
+  runAgent: (id: string, body?: AgentRunRequest) =>
+    request<AgentRunResponse>(`/api/agents/${encodeURIComponent(id)}/run`, {
+      method: 'POST',
+      body: JSON.stringify(body ?? {}),
+    }),
 }

@@ -5,7 +5,7 @@ import (
 	"fmt"
 )
 
-const schemaVersion = 1
+const schemaVersion = 3
 
 const createTablesSQL = `
 CREATE TABLE IF NOT EXISTS schema_version (
@@ -81,6 +81,19 @@ CREATE TABLE IF NOT EXISTS memory (
 	PRIMARY KEY (task_id, key),
 	FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
 );
+
+CREATE TABLE IF NOT EXISTS objectives (
+	id TEXT PRIMARY KEY,
+	conversation_id TEXT NOT NULL UNIQUE,
+	title TEXT NOT NULL DEFAULT '',
+	goal TEXT NOT NULL DEFAULT '',
+	constraints TEXT NOT NULL DEFAULT '',
+	tools_required TEXT NOT NULL DEFAULT '[]',
+	success_criteria TEXT NOT NULL DEFAULT '',
+	created_at TEXT NOT NULL,
+	updated_at TEXT NOT NULL,
+	FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
+);
 `
 
 // Migrate ensures the database schema is up to date.
@@ -109,13 +122,67 @@ func Migrate(db *sql.DB) error {
 		return fmt.Errorf("reading schema version: %w", err)
 	}
 
+	if currentVersion < 2 {
+		if err := migrateToV2(db); err != nil {
+			return fmt.Errorf("migrating to v2: %w", err)
+		}
+		if _, err := db.Exec(`UPDATE schema_version SET version = 2`); err != nil {
+			return fmt.Errorf("updating schema version: %w", err)
+		}
+	}
+	if currentVersion < 3 {
+		if err := migrateToV3(db); err != nil {
+			return fmt.Errorf("migrating to v3: %w", err)
+		}
+		if _, err := db.Exec(`UPDATE schema_version SET version = 3`); err != nil {
+			return fmt.Errorf("updating schema version: %w", err)
+		}
+	}
+
 	if currentVersion < schemaVersion {
-		// Future migrations go here:
-		// if currentVersion < 2 { migrateV1toV2(db) }
 		if _, err := db.Exec(`UPDATE schema_version SET version = ?`, schemaVersion); err != nil {
 			return fmt.Errorf("updating schema version: %w", err)
 		}
 	}
 
 	return nil
+}
+
+const migrateV2SQL = `
+CREATE TABLE IF NOT EXISTS agents (
+	id TEXT PRIMARY KEY,
+	name TEXT NOT NULL,
+	slug TEXT NOT NULL UNIQUE,
+	description TEXT NOT NULL DEFAULT '',
+	instructions TEXT NOT NULL DEFAULT '',
+	script_bundle_json TEXT NOT NULL DEFAULT '{}',
+	enabled INTEGER NOT NULL DEFAULT 1,
+	created_at TEXT NOT NULL,
+	updated_at TEXT NOT NULL
+);
+`
+
+func migrateToV2(db *sql.DB) error {
+	_, err := db.Exec(migrateV2SQL)
+	return err
+}
+
+const migrateV3SQL = `
+CREATE TABLE IF NOT EXISTS objectives (
+	id TEXT PRIMARY KEY,
+	conversation_id TEXT NOT NULL UNIQUE,
+	title TEXT NOT NULL DEFAULT '',
+	goal TEXT NOT NULL DEFAULT '',
+	constraints TEXT NOT NULL DEFAULT '',
+	tools_required TEXT NOT NULL DEFAULT '[]',
+	success_criteria TEXT NOT NULL DEFAULT '',
+	created_at TEXT NOT NULL,
+	updated_at TEXT NOT NULL,
+	FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
+);
+`
+
+func migrateToV3(db *sql.DB) error {
+	_, err := db.Exec(migrateV3SQL)
+	return err
 }

@@ -153,3 +153,66 @@ type CostInfo struct {
 	CompletionTokens int `json:"completion"`
 	TotalTokens      int `json:"total"`
 }
+
+// --- Objectives ---
+
+type Objective struct {
+	ID              string    `json:"id"`
+	ConversationID  string    `json:"conversation_id"`
+	Title           string    `json:"title"`
+	Goal            string    `json:"goal"`
+	Constraints     string    `json:"constraints"`
+	ToolsRequired   []string  `json:"tools_required"`
+	SuccessCriteria string    `json:"success_criteria"`
+	CreatedAt       time.Time `json:"created_at"`
+	UpdatedAt       time.Time `json:"updated_at"`
+}
+
+type UpsertObjectiveRequest struct {
+	Title           string   `json:"title"`
+	Goal            string   `json:"goal"`
+	Constraints     string   `json:"constraints,omitempty"`
+	ToolsRequired   []string `json:"tools_required,omitempty"`
+	SuccessCriteria string   `json:"success_criteria,omitempty"`
+}
+
+// --- Commands (Load 6) ---
+
+type CommandExecuteRequest struct {
+	Input   string `json:"input"`
+	Confirm bool   `json:"confirm"`
+}
+
+type CommandExecuteResponse struct {
+	OK         bool   `json:"ok"`
+	Output     string `json:"output"`
+	Stderr     string `json:"stderr,omitempty"`
+	ExitCode   int    `json:"exit_code"`
+	DurationMs int64  `json:"duration_ms"`
+}
+
+// --- Agents (Load 6, 8) ---
+
+type Agent struct {
+	ID           string         `json:"id"`
+	Name         string         `json:"name"`
+	Slug         string         `json:"slug"`
+	Description  string         `json:"description"`
+	Instructions string         `json:"instructions"`
+	ScriptBundle map[string]any `json:"script_bundle,omitempty"`
+	Enabled      bool           `json:"enabled"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+}
+
+type AgentRunRequest struct {
+	InputPayload map[string]any `json:"input_payload,omitempty"`
+}
+
+type AgentRunResponse struct {
+	OK         bool   `json:"ok"`
+	Output     string `json:"output"`
+	ExitCode   int    `json:"exit_code"`
+	DurationMs int64  `json:"duration_ms"`
+}
+

@@ -17,6 +17,9 @@ type Server struct {
 	Runs          *services.RunService
 	Memory        *services.MemoryService
 	Providers     *services.ProviderService
+	Commands      *services.CommandService
+	Agents        *services.AgentService
+	Objectives    *services.ObjectiveService
 }
 
 // NewServer creates a Server with all services wired up.
@@ -26,6 +29,9 @@ func NewServer(
 	runSvc *services.RunService,
 	memSvc *services.MemoryService,
 	provSvc *services.ProviderService,
+	cmdSvc *services.CommandService,
+	agentSvc *services.AgentService,
+	objSvc *services.ObjectiveService,
 ) *Server {
 	return &Server{
 		Conversations: convSvc,
@@ -33,6 +39,9 @@ func NewServer(
 		Runs:          runSvc,
 		Memory:        memSvc,
 		Providers:     provSvc,
+		Commands:      cmdSvc,
+		Agents:        agentSvc,
+		Objectives:    objSvc,
 	}
 }
 
@@ -50,6 +59,9 @@ func (s *Server) RegisterRoutes(r chi.Router) {
 				r.Delete("/", s.HandleDeleteConversation)
 				r.Post("/messages", s.HandlePostMessage)
 				r.Post("/draft-task", s.HandleDraftTaskFromConversation)
+				r.Get("/objective", s.HandleGetObjective)
+				r.Put("/objective", s.HandleUpsertObjective)
+				r.Get("/objective/export", s.HandleExportObjectiveMarkdown)
 			})
 		})
 
@@ -85,6 +97,18 @@ func (s *Server) RegisterRoutes(r chi.Router) {
 			r.Put("/", s.HandleSetMemory)
 			r.Put("/{key}", s.HandleSetMemoryKey)
 		})
+
+		// Commands (Load 6)
+		r.Post("/commands/execute", s.HandleExecuteCommand)
+
+		// Agents (Load 6, 8)
+		r.Get("/agents", s.HandleListAgents)
+		r.Get("/agents/slug/{slug}", s.HandleGetAgentBySlug)
+		r.Route("/agents/{id}", func(r chi.Router) {
+			r.Get("/", s.HandleGetAgent)
+			r.Post("/run", s.HandleRunAgent)
+		})
+
 	})
 }
 

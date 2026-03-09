@@ -13,3 +13,7 @@ frontend/.env
 backend/openade-backend
 tsconfig.tsbuildinfo
 frontend/tsconfig.tsbuildinfo
+
+backend/api
+
+backend/api
