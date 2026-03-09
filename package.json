@@ -1,0 +1,18 @@
+{
+  "name": "open-ade",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "bash ./scripts/dev.sh",
+    "dev:frontend": "cd frontend && pnpm run dev",
+    "dev:backend": "bash ./scripts/backend.sh",
+    "health": "bash ./scripts/healthcheck.sh",
+    "build": "cd frontend && pnpm run build",
+    "tauri": "tauri",
+    "tauri:dev": "tauri dev",
+    "tauri:build": "tauri build"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2"
+  }
+}

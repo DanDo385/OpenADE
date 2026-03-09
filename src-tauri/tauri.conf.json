@@ -1,0 +1,24 @@
+{
+  "productName": "OpenADE",
+  "version": "0.1.0",
+  "identifier": "app.openade.open-ade",
+  "build": {
+    "beforeDevCommand": "pnpm run dev",
+    "devUrl": "http://localhost:5173",
+    "beforeBuildCommand": "pnpm run build",
+    "frontendDist": "../frontend/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "OpenADE",
+        "width": 1100,
+        "height": 700,
+        "resizable": true
+      }
+    ]
+  },
+  "bundle": {
+    "active": true
+  }
+}

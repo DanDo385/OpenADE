@@ -1,0 +1,15 @@
+node_modules/
+frontend/node_modules/
+dist/
+frontend/dist/
+target/
+*.db
+*.db-shm
+*.db-wal
+.DS_Store
+*.log
+.env
+frontend/.env
+backend/openade-backend
+tsconfig.tsbuildinfo
+frontend/tsconfig.tsbuildinfo
