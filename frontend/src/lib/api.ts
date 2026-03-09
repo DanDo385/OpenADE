@@ -13,6 +13,10 @@ import type {
   ErrorResponse,
   ExportBundle,
   MCPServer,
+  MCPServerTestResponse,
+  MCPToolCallRequest,
+  MCPToolCallResponse,
+  MCPToolInfo,
   Objective,
   ProviderSaveRequest,
   ProviderSaveResponse,
@@ -363,8 +367,17 @@ export const api = {
       method: 'DELETE',
     }),
   testMCPServer: (id: string) =>
-    request<{ ok: boolean; message?: string }>(
+    request<MCPServerTestResponse>(
       `/api/mcp/servers/${encodeURIComponent(id)}/test`,
       { method: 'POST' }
     ),
+  listMCPTools: (serverId: string) =>
+    request<MCPToolInfo[]>(`/api/mcp/servers/${encodeURIComponent(serverId)}/tools`, {
+      method: 'GET',
+    }),
+  callMCPTool: (body: MCPToolCallRequest) =>
+    request<MCPToolCallResponse>('/api/mcp/tools/call', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
 }

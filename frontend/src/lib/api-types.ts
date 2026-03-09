@@ -252,8 +252,8 @@ export interface MCPServer {
   name: string
   transport: MCPTransport
   command_or_url: string
-  args_json: string
-  env_json: string
+  args: string[]
+  env: Record<string, string>
   enabled: boolean
   created_at: string
   updated_at: string
@@ -263,8 +263,8 @@ export interface CreateMCPServerRequest {
   name: string
   transport: MCPTransport
   command_or_url: string
-  args_json?: string
-  env_json?: string
+  args?: string[]
+  env?: Record<string, string>
   enabled?: boolean
 }
 
@@ -272,7 +272,40 @@ export interface UpdateMCPServerRequest {
   name?: string
   transport?: MCPTransport
   command_or_url?: string
-  args_json?: string
-  env_json?: string
+  args?: string[]
+  env?: Record<string, string>
   enabled?: boolean
+}
+
+export interface MCPToolInfo {
+  name: string
+  description?: string
+  input_schema?: unknown
+  output_schema?: unknown
+}
+
+export interface MCPServerTestResponse {
+  ok: boolean
+  message: string
+  tool_count?: number
+  tools?: MCPToolInfo[]
+}
+
+export interface MCPToolCallRequest {
+  server_id: string
+  tool_name: string
+  arguments?: Record<string, unknown>
+}
+
+export interface MCPToolContentItem {
+  type?: string
+  text?: string
+  [key: string]: unknown
+}
+
+export interface MCPToolCallResponse {
+  content?: MCPToolContentItem[]
+  structuredContent?: unknown
+  isError?: boolean
+  [key: string]: unknown
 }
