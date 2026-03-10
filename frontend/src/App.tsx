@@ -193,7 +193,7 @@ function AppShell() {
       <header className="topbar">
         <div className="topbar__brand">
           <h1>OpenADE</h1>
-          <small>API: {API_BASE_URL}</small>
+          <small>API: {API_BASE_URL || '(proxy)'}</small>
         </div>
 
         <nav className="topbar__panels" aria-label="Panel selector">

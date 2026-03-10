@@ -57,6 +57,7 @@ func NewServer(
 
 // RegisterRoutes mounts all API routes onto the given chi router.
 func (s *Server) RegisterRoutes(r chi.Router) {
+	r.Get("/", s.HandleRoot)
 	r.Get("/health", s.HandleHealth)
 
 	r.Route("/api", func(r chi.Router) {

@@ -36,6 +36,7 @@ pnpm install
 cd frontend && pnpm install && cd ..
 cp .env.example .env
 cp frontend/.env.example frontend/.env
+# Optional: set OPENAI_API_KEY / OPENAI_DEFAULT_MODEL in .env for no-click startup
 pnpm run dev
 ```
 
@@ -53,6 +54,7 @@ pnpm run health
   - the Vite frontend on `http://localhost:5173`
 - Open `http://localhost:5173` in your browser.
 - The default local env values live in [.env.example](/Users/danmagro/Desktop/Code/open-ade/.env.example) and [frontend/.env.example](/Users/danmagro/Desktop/Code/open-ade/frontend/.env.example).
+- If you set `OPENAI_API_KEY` in `.env`, the backend will use it as a fallback provider for browser/dev usage.
 - For a concrete onboarding path, see [docs/FIRST_30_MINUTES.md](/Users/danmagro/Desktop/Code/open-ade/docs/FIRST_30_MINUTES.md).
 
 ## First Use
@@ -63,7 +65,10 @@ pnpm run health
 4. Save the provider config.
 5. Go back to `Chat` and start a conversation.
 
-Without a provider, chat and task runs will not work.
+Alternative:
+- Put `OPENAI_API_KEY` in `.env` and skip the first-time provider form in local browser/dev mode.
+
+Without a saved provider or env fallback, chat and task runs will not work.
 
 ## Chat Flow
 

@@ -14,17 +14,24 @@ This walkthrough gets you from a fresh checkout to a usable chat, a saved task, 
    cp .env.example .env
    cp frontend/.env.example frontend/.env
    ```
-3. Start the browser version:
+3. Optional shortcut: put your provider in `.env` before starting:
+   ```bash
+   OPENAI_API_KEY=sk-...
+   OPENAI_DEFAULT_MODEL=gpt-4o-mini
+   ```
+4. Start the browser version:
    ```bash
    pnpm run dev
    ```
-4. Open `http://localhost:5173`.
-5. If you want to confirm the backend is alive:
+5. Open `http://localhost:5173`.
+6. If you want to confirm the backend is alive:
    ```bash
    pnpm run health
    ```
 
 ## 5-10 Minutes: Configure A Provider
+
+If you set `OPENAI_API_KEY` in `.env`, you can skip this step for local browser/dev usage.
 
 1. In the app, open `Settings`.
 2. In `Provider settings`, enter:

@@ -39,7 +39,9 @@ function trimTrailingSlash(value: string): string {
   return value.replace(/\/+$/, '')
 }
 
-export const API_BASE_URL = trimTrailingSlash(import.meta.env.VITE_API_URL ?? DEFAULT_API_BASE_URL)
+// In dev, always use relative URLs (Vite proxy); in prod use env or default
+export const API_BASE_URL =
+  import.meta.env.DEV ? '' : trimTrailingSlash(import.meta.env.VITE_API_URL ?? DEFAULT_API_BASE_URL)
 
 export class APIError extends Error {
   readonly status: number

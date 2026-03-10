@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"os"
 
 	"github.com/google/uuid"
 	"openade/internal/model"
@@ -43,7 +44,17 @@ func (s *ProviderService) List(ctx context.Context) ([]model.ProviderConfig, err
 		cfg := parseProviderConfig(id, provider, configJSON)
 		configs = append(configs, cfg)
 	}
-	return configs, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	if !hasProvider(configs, "openai") {
+		if cfg := envProviderConfig("openai"); cfg != nil {
+			configs = append(configs, *cfg)
+		}
+	}
+
+	return configs, nil
 }
 
 func (s *ProviderService) Get(ctx context.Context, provider string) (*model.ProviderConfig, error) {
@@ -58,6 +69,11 @@ func (s *ProviderService) Get(ctx context.Context, provider string) (*model.Prov
 		return nil, fmt.Errorf("getting provider: %w", err)
 	}
 	cfg := parseProviderConfig(id, provider, configJSON)
+	if !cfg.Configured {
+		if envCfg := envProviderConfig(provider); envCfg != nil {
+			return envCfg, nil
+		}
+	}
 	return &cfg, nil
 }
 
@@ -119,5 +135,38 @@ func parseProviderConfig(id, provider, configJSON string) model.ProviderConfig {
 		BaseURL:      settings.BaseURL,
 		DefaultModel: settings.DefaultModel,
 		Configured:   settings.APIKey != "",
+	}
+}
+
+func hasProvider(configs []model.ProviderConfig, provider string) bool {
+	for _, cfg := range configs {
+		if cfg.Provider == provider {
+			return true
+		}
+	}
+	return false
+}
+
+func envProviderConfig(provider string) *model.ProviderConfig {
+	switch provider {
+	case "openai":
+		apiKey := os.Getenv("OPENAI_API_KEY")
+		if apiKey == "" {
+			return nil
+		}
+		defaultModel := os.Getenv("OPENAI_DEFAULT_MODEL")
+		if defaultModel == "" {
+			defaultModel = "gpt-4o-mini"
+		}
+		return &model.ProviderConfig{
+			ID:           "env-openai",
+			Provider:     "openai",
+			APIKey:       apiKey,
+			BaseURL:      os.Getenv("OPENAI_BASE_URL"),
+			DefaultModel: defaultModel,
+			Configured:   true,
+		}
+	default:
+		return nil
 	}
 }
