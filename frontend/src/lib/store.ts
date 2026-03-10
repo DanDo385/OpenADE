@@ -31,19 +31,30 @@ export const useUIStore = create<UIState>((set) => ({
   providerModalOpen: false,
   taskWizardOpen: false,
   taskWizardConversationId: null,
-  setActivePanel: (panel) => set({ activePanel: panel }),
-  setActiveConversationId: (id) => set({ activeConversationId: id }),
-  setActiveTaskId: (id) => set({ activeTaskId: id }),
-  setActiveRunId: (id) => set({ activeRunId: id }),
-  setTheme: (theme) => set({ theme }),
+  setActivePanel: (panel) =>
+    set((state) => (state.activePanel === panel ? state : { activePanel: panel })),
+  setActiveConversationId: (id) =>
+    set((state) => (state.activeConversationId === id ? state : { activeConversationId: id })),
+  setActiveTaskId: (id) =>
+    set((state) => (state.activeTaskId === id ? state : { activeTaskId: id })),
+  setActiveRunId: (id) =>
+    set((state) => (state.activeRunId === id ? state : { activeRunId: id })),
+  setTheme: (theme) => set((state) => (state.theme === theme ? state : { theme })),
   toggleTheme: () =>
     set((state) => ({
       theme: state.theme === 'dark' ? 'light' : 'dark',
     })),
-  setProviderModalOpen: (open) => set({ providerModalOpen: open }),
+  setProviderModalOpen: (open) =>
+    set((state) => (state.providerModalOpen === open ? state : { providerModalOpen: open })),
   setTaskWizardOpen: (open, conversationId) =>
-    set({
-      taskWizardOpen: open,
-      taskWizardConversationId: conversationId ?? null,
+    set((state) => {
+      const nextConversationId = conversationId ?? null
+      if (state.taskWizardOpen === open && state.taskWizardConversationId === nextConversationId) {
+        return state
+      }
+      return {
+        taskWizardOpen: open,
+        taskWizardConversationId: nextConversationId,
+      }
     }),
 }))

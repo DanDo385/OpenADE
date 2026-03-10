@@ -114,14 +114,20 @@ function AppShell() {
     if (activeConversationId && conversations.some((c) => c.id === activeConversationId)) {
       return
     }
-    setActiveConversationId(conversations[0]?.id ?? null)
+    const nextConversationId = conversations[0]?.id ?? null
+    if (nextConversationId !== activeConversationId) {
+      setActiveConversationId(nextConversationId)
+    }
   }, [activeConversationId, conversations, setActiveConversationId])
 
   useEffect(() => {
     if (activeTaskId && tasks.some((t) => t.id === activeTaskId)) {
       return
     }
-    setActiveTaskId(tasks[0]?.id ?? null)
+    const nextTaskId = tasks[0]?.id ?? null
+    if (nextTaskId !== activeTaskId) {
+      setActiveTaskId(nextTaskId)
+    }
   }, [activeTaskId, tasks, setActiveTaskId])
 
   const onCreateConversation = async () => {

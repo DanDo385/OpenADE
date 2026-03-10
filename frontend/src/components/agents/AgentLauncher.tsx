@@ -12,7 +12,8 @@ export function AgentLauncher({ agent }: AgentLauncherProps) {
   const [output, setOutput] = useState<string | null>(null)
 
   const runMutation = useMutation({
-    mutationFn: () => api.runAgent(agent.id, {}),
+    mutationFn: () =>
+      api.runAgent(agent.id, { input_payload: { message: 'Run' } }),
     onSuccess: (data) => {
       setOutput(data.output)
     },

@@ -1,5 +1,4 @@
 #!/usr/bin/env bash
-# Combined dev: starts backend + frontend. Prefer separate terminals (dev:backend, dev:frontend).
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
@@ -10,24 +9,30 @@ if [ -f "$ROOT_DIR/.env" ]; then
 fi
 
 OPENADE_PORT="${OPENADE_PORT:-8080}"
-OPENADE_DB_PATH="${OPENADE_DB_PATH:-$ROOT_DIR/backend/openade.db}"
-[[ "$OPENADE_DB_PATH" != /* ]] && OPENADE_DB_PATH="$ROOT_DIR/$OPENADE_DB_PATH"
 
 cleanup() {
-  [ -n "${BACKEND_PID:-}" ] && kill -0 "$BACKEND_PID" 2>/dev/null && kill "$BACKEND_PID" 2>/dev/null || true
+  if [ -n "${BACKEND_PID:-}" ] && kill -0 "$BACKEND_PID" 2>/dev/null; then
+    kill "$BACKEND_PID" 2>/dev/null || true
+  fi
 }
 trap cleanup EXIT INT TERM
 
-echo "Starting backend on :$OPENADE_PORT ..."
-(cd "$ROOT_DIR/backend" && OPENADE_PORT="$OPENADE_PORT" OPENADE_DB_PATH="$OPENADE_DB_PATH" go run ./cmd/api) &
+echo "Starting backend API on http://localhost:${OPENADE_PORT} ..."
+bash "$ROOT_DIR/scripts/backend.sh" &
 BACKEND_PID=$!
 
-echo "Waiting for backend..."
+echo "Waiting for backend health check..."
 for i in {1..20}; do
-  curl -fsS "http://localhost:${OPENADE_PORT}/health" >/dev/null 2>&1 && echo "Backend ready." && break
+  if curl -fsS "http://localhost:${OPENADE_PORT}/health" >/dev/null 2>&1; then
+    echo "Backend is ready."
+    break
+  fi
   sleep 0.5
+  if [ "$i" -eq 20 ]; then
+    echo "Backend did not become ready on http://localhost:${OPENADE_PORT}/health" >&2
+    exit 1
+  fi
 done
 
-echo "Starting frontend..."
-cd "$ROOT_DIR/frontend"
-VITE_API_URL= pnpm run dev
+echo "Starting frontend web app on http://localhost:5173 ..."
+exec bash "$ROOT_DIR/scripts/frontend.sh"
