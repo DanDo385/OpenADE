@@ -31,28 +31,36 @@ OpenADE is not just a task app. The goal is to give models a flexible environmen
 
 ## Run
 
+**Preferred: two terminals (simplest, no automation)**
+
+```bash
+# Terminal 1 — backend
+pnpm run dev:backend
+
+# Terminal 2 — frontend (after backend is up)
+pnpm run dev:frontend
+```
+
+Then open **http://localhost:5173/** in your browser.
+
+**Alternative: one command**
+
 ```bash
 pnpm install
 cd frontend && pnpm install && cd ..
 cp .env.example .env
 cp frontend/.env.example frontend/.env
-# Optional: set OPENAI_API_KEY / OPENAI_DEFAULT_MODEL in .env for no-click startup
 pnpm run dev
 ```
 
-```bash
-pnpm run dev:backend   # backend only
-pnpm run dev:frontend  # frontend only
-pnpm run health
-```
+**Node:** Use Node 20 or 22. Node 25 can hang Vite (`nvm use 22` or `fnm use 22`).
 
 ## Browser Start
 
-- Start with the browser version first. It is the fastest way to explore the product.
-- `pnpm run dev` starts:
-  - the Go backend on `http://localhost:8080`
-  - the Vite frontend on `http://localhost:5173`
-- Open `http://localhost:5173` in your browser.
+- Backend: `http://localhost:8080` (Go API)
+- Frontend: `http://localhost:5173` (Vite)
+- Open `http://localhost:5173` in your browser — include the `:5173` port.
+- See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for connections.
 - The default local env values live in [.env.example](/Users/danmagro/Desktop/Code/open-ade/.env.example) and [frontend/.env.example](/Users/danmagro/Desktop/Code/open-ade/frontend/.env.example).
 - If you set `OPENAI_API_KEY` in `.env`, the backend will use it as a fallback provider for browser/dev usage.
 - For a concrete onboarding path, see [docs/FIRST_30_MINUTES.md](/Users/danmagro/Desktop/Code/open-ade/docs/FIRST_30_MINUTES.md).

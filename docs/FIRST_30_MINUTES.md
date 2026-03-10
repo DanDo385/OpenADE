@@ -14,20 +14,16 @@ This walkthrough gets you from a fresh checkout to a usable chat, a saved task, 
    cp .env.example .env
    cp frontend/.env.example frontend/.env
    ```
-3. Optional shortcut: put your provider in `.env` before starting:
+3. Use Node 20 or 22 (Node 25 can hang Vite): `nvm use 22` or `fnm use 22`
+4. Start backend and frontend in **separate terminals**:
    ```bash
-   OPENAI_API_KEY=sk-...
-   OPENAI_DEFAULT_MODEL=gpt-4o-mini
+   # Terminal 1
+   pnpm run dev:backend
+
+   # Terminal 2 (after backend is up)
+   pnpm run dev:frontend
    ```
-4. Start the browser version:
-   ```bash
-   pnpm run dev
-   ```
-5. Open `http://localhost:5173`.
-6. If you want to confirm the backend is alive:
-   ```bash
-   pnpm run health
-   ```
+5. Open `http://localhost:5173/` in your browser (include the `:5173` port).
 
 ## 5-10 Minutes: Configure A Provider
 

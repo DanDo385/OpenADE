@@ -2,6 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>OpenADE</title>
   </head>
@@ -9,6 +10,21 @@
     <div id="root" style="width:100%;min-height:100vh">
       <p style="padding:1rem;text-align:center">Loading OpenADE…</p>
     </div>
+    <script>
+      // #region agent log
+      fetch('http://127.0.0.1:7487/ingest/66eada7b-49c2-4766-979c-edf5216a8dfb',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'73e4d6'},body:JSON.stringify({sessionId:'73e4d6',runId:'pre-fix',hypothesisId:'H1',location:'frontend/index.html:13',message:'index_html_loaded',data:{url:window.location.href,readyState:document.readyState},timestamp:Date.now()})}).catch(()=>{});
+      // #endregion
+      window.addEventListener('error', function (event) {
+        // #region agent log
+        fetch('http://127.0.0.1:7487/ingest/66eada7b-49c2-4766-979c-edf5216a8dfb',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'73e4d6'},body:JSON.stringify({sessionId:'73e4d6',runId:'pre-fix',hypothesisId:'H4',location:'frontend/index.html:17',message:'window_error',data:{message:String(event.message||''),filename:String(event.filename||''),lineno:Number(event.lineno||0),colno:Number(event.colno||0)},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+      })
+      window.addEventListener('unhandledrejection', function (event) {
+        // #region agent log
+        fetch('http://127.0.0.1:7487/ingest/66eada7b-49c2-4766-979c-edf5216a8dfb',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'73e4d6'},body:JSON.stringify({sessionId:'73e4d6',runId:'pre-fix',hypothesisId:'H4',location:'frontend/index.html:22',message:'window_unhandledrejection',data:{reason:String((event.reason&&event.reason.message)||event.reason||'')},timestamp:Date.now()})}).catch(()=>{});
+        // #endregion
+      })
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

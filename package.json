@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "dev": "bash ./scripts/dev.sh",
-    "dev:frontend": "cd frontend && pnpm run dev",
+    "dev:frontend": "bash ./scripts/frontend.sh",
     "dev:backend": "bash ./scripts/backend.sh",
     "health": "bash ./scripts/healthcheck.sh",
     "build": "cd frontend && pnpm run build",
