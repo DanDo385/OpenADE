@@ -64,6 +64,8 @@ pnpm run dev
 - The default local env values live in [.env.example](/Users/danmagro/Desktop/Code/open-ade/.env.example) and [frontend/.env.example](/Users/danmagro/Desktop/Code/open-ade/frontend/.env.example).
 - If you set `OPENAI_API_KEY` in `.env`, the backend will use it as a fallback provider for browser/dev usage.
 - For a concrete onboarding path, see [docs/FIRST_30_MINUTES.md](/Users/danmagro/Desktop/Code/open-ade/docs/FIRST_30_MINUTES.md).
+- For the next-stage behavior/runtime roadmap, see [docs/BEHAVIOR_LAYER_IMPLEMENTATION_PLAN.md](/Users/danmagro/Desktop/Code/open-ade/docs/BEHAVIOR_LAYER_IMPLEMENTATION_PLAN.md).
+- For a flagship interactive app concept, see [docs/ROOM_PILOT_APP_BLUEPRINT.md](/Users/danmagro/Desktop/Code/open-ade/docs/ROOM_PILOT_APP_BLUEPRINT.md).
 
 ## First Use
 
